@@ -1,13 +1,13 @@
 # ShrinkBayes
 R package for differential expression: sequencing counts (RNAseq), microarrays, and HTRNAi
 
-This site corresponds to the papers:
+This package corresponds to the papers:
 
-Van de Wiel MA, Neerincx M, Buffart TE, Sie D, Verheul HMW (2014). ShrinkBayes: a versatile R-package for analysis of count-based sequencing data in complex study designs. BMC Bioinformatics. 15(1):116.
+- Van de Wiel MA, Neerincx M, Buffart TE, Sie D, Verheul HMW (2014). ShrinkBayes: a versatile R-package for analysis of count-based sequencing data in complex study designs. BMC Bioinformatics. 15(1):116.
 
-Van de Wiel MA,  De Menezes RX, Siebring E, Van Beusechem VW (2013). Analysis of small-sample clinical genomics studies using multi-parameter shrinkage: application to high-throughput RNA interference screening. BMC Med Genom 6 (Suppl 2), S1.
+- Van de Wiel MA,  De Menezes RX, Siebring E, Van Beusechem VW (2013). Analysis of small-sample clinical genomics studies using multi-parameter shrinkage: application to high-throughput RNA interference screening. BMC Med Genom 6 (Suppl 2), S1.
 
- Van de Wiel MA, Leday GGR, Pardo L, Rue H, Van der Vaart AW, Van Wieringen WN (2012). Bayesian analysis of RNA sequencing data by estimating multiple shrinkage priors. Biostatistics 14, 113-128.
+- Van de Wiel MA, Leday GGR, Pardo L, Rue H, Van der Vaart AW, Van Wieringen WN (2012). Bayesian analysis of RNA sequencing data by estimating multiple shrinkage priors. Biostatistics 14, 113-128.
 
 
 Why use ShrinkBayes?
