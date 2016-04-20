@@ -1,0 +1,26 @@
+\contentsline {section}{\numberline {1}Overview}{2}{section.1}
+\contentsline {section}{\numberline {2}Pre-amble: Accounting for different library sizes}{4}{section.2}
+\contentsline {section}{\numberline {3}Example 0, Easy Start: ShrinkBayes in one line}{5}{section.3}
+\contentsline {section}{\numberline {4}Example 1: Gaussian simulation setting, 2-group setting}{7}{section.4}
+\contentsline {subsection}{\numberline {4.1}Workflow}{7}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Results when using the correct prior}{12}{subsection.4.2}
+\contentsline {section}{\numberline {5}Example 2: Gaussian setting, HT RNAi data}{14}{section.5}
+\contentsline {section}{\numberline {6}Example 3: CAGE data}{24}{section.6}
+\contentsline {section}{\numberline {7}Practical considerations to guide choices in the analysis workflow}{32}{section.7}
+\contentsline {subsection}{\numberline {7.1}Trying {\tt ShrinkBayes} on your data}{32}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}To shrink or not to shrink?}{33}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Paired data}{34}{subsection.7.3}
+\contentsline {subsection}{\numberline {7.4}Choice of the prior}{34}{subsection.7.4}
+\contentsline {subsection}{\numberline {7.5}When should I use {\tt mixtdisp=TRUE}?}{35}{subsection.7.5}
+\contentsline {subsection}{\numberline {7.6}Shape of the nonparametric prior: logconcave, unimodal, symmetric}{35}{subsection.7.6}
+\contentsline {subsection}{\numberline {7.7}What threshold to use for testing (lfdr and BFDR computation)?}{36}{subsection.7.7}
+\contentsline {subsection}{\numberline {7.8}How to deal with extremely large data sets?}{36}{subsection.7.8}
+\contentsline {subsection}{\numberline {7.9}Tips for speeding up computations}{36}{subsection.7.9}
+\contentsline {section}{\numberline {8}Future topics}{37}{section.8}
+\contentsline {section}{\numberline {9}Appendix}{38}{section.9}
+\contentsline {subsection}{\numberline {9.1}Code used for generating the simulated data set `datsim'}{38}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Code for simulated example}{38}{subsection.9.2}
+\contentsline {subsection}{\numberline {9.3}Code for HTRNAi example}{38}{subsection.9.3}
+\contentsline {subsection}{\numberline {9.4}Code for CAGE example}{39}{subsection.9.4}
+\contentsline {subsection}{\numberline {9.5}Code for running {\tt ShrinkBayes} on very large data sets: simulated example}{40}{subsection.9.5}
+\contentsline {subsection}{\numberline {9.6}Code used for True FDR in simulation setting}{42}{subsection.9.6}

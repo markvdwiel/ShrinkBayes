@@ -1,0 +1,35 @@
+\begin{thebibliography}{}
+
+\bibitem[Anders and Huber, 2010]{Huber2010}
+Anders, S. and Huber, W. (2010).
+\newblock {{D}ifferential expression analysis for sequence count data}.
+\newblock {\em Genome Biol}, 11:R106.
+
+\bibitem[Lutz and Rufibach, 2011]{Dumbgen2011}
+Lutz, D. and Rufibach, K. (2011).
+\newblock {logcondens}: {C}omputations related to univariate log-concave
+  density estimation.
+\newblock {\em J. Statist. Software}, 39:1--28.
+
+\bibitem[{Van de Wiel} et~al., 2013]{WielHTRNAi}
+{Van de Wiel}, M., de~Menezes, R., {Siebring-van Olst}, E., and van Beusechem,
+  V. (2013).
+\newblock Analysis of small-sample clinical genomics studies using
+  multi-parameter shrinkage: application to high-throughput {RNA} interference
+  screening.
+\newblock {\em BMC Med. Genom.}, Accepted.
+
+\bibitem[{Van de Wiel} et~al., 2012]{WielShrinkSeq}
+{Van de Wiel}, M., Leday, G., Pardo, L., Rue, H., {van der Vaart}, A., and {van
+  Wieringen}, W. (2012).
+\newblock Bayesian analysis of {RNA} sequencing data by estimating multiple
+  shrinkage priors.
+\newblock {\em Biostatistics}, doi: 10.1093/biostatistics/kxs031.
+
+\bibitem[Ventrucci et~al., 2011]{Ventrucci}
+Ventrucci, M., Scott, E.~M., and Cocchi, D. (2011).
+\newblock {{M}ultiple testing on standardized mortality ratios: a {B}ayesian
+  hierarchical model for {F}{D}{R} estimation}.
+\newblock {\em Biostatistics}, 12:51--67.
+
+\end{thebibliography}

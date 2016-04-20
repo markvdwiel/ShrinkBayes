@@ -1,0 +1,12 @@
+Package: ShrinkBayes
+Type: Package
+Title: Bayesian analysis of high-dimensional omics data, either Gaussian or counts 
+Version: 2.12
+Date: 2015-02-09
+Author: Mark A. van de Wiel
+Maintainer: Mark A. van de Wiel <mark.vdwiel@vumc.nl>
+Depends: R (>= 3.0.1), snowfall, INLA, VGAM, mclust, logcondens, Iso, XML,rgl
+Suggests: Biobase
+Description: This package provides differential expression analysis for a variety of omics data, including: RNA-seq, CAGE, miRNA-seq, HT RNAi, mRNA microarray, miRNA microarray. It is particulary useful for relatively small sample sizes, because it applies Empirical Bayes-type estimation of priors for multi-parameter shrinkage to increase power and reproducibility. Mixture and nonparametric priors are accommodated. In addition, it provides Bayesian multiplicity correction, by lfdr and BFDR estimation.
+License: GPL (http://www.gnu.org/copyleft/gpl.html)
+LazyLoad: yes
