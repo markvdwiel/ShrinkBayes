@@ -42,3 +42,5 @@ sudo apt-get build-dep r-cran-rgl
 Then, install ShrinkBayes:
 library("devtools")
 install_github("markvdwiel/ShrinkBayes")
+
+A pdf Vignette is available in the inst/doc folder
