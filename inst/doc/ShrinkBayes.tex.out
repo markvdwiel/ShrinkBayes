@@ -1,9 +1,0 @@
-\BOOKMARK [1][-]{section.1}{Overview}{}% 1
-\BOOKMARK [1][-]{section.2}{Example 1: Gaussian simulation setting, 2-group setting}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Workflow}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Results when using a misspecified prior}{section.2}% 4
-\BOOKMARK [1][-]{section.3}{Example 2: Gaussian setting, HT RNAi data}{}% 5
-\BOOKMARK [1][-]{section.4}{CAGE data}{}% 6
-\BOOKMARK [1][-]{section.5}{Future topics}{}% 7
-\BOOKMARK [1][-]{section.6}{Appendix}{}% 8
-\BOOKMARK [2][-]{subsection.6.1}{Code used for generating the simulated data set `datsim'}{section.6}% 9
