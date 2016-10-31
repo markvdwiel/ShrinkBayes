@@ -196,7 +196,8 @@ meanest <- unlist(lapply(pxbeta, function(postdisti)
             {
             if(!is.null(poster))
             {
-            pr0 <- INLA:::inla.expectation(function(x) x,poster)
+            #pr0 <- INLA:::inla.expectation(function(x) x,poster)
+              pr0 <- myinla.expectation(function(x) x,poster)
             return(pr0)
             } else {
             return(NULL)
