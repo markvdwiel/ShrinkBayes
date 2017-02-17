@@ -4,9 +4,10 @@ pminvec = c(0,0.25,0.5,0.75,1),p0vec = c(0.5,0.7,0.9,0.95,0.98,0.99,1),
 meanvec = c(0.1, 0.3, 0.5, 0.75,1.5),sdvec=c(0.2,0.5,0.8,1.5,3),meansdauto=TRUE,
 ncpus=2,refinegrid=TRUE, symmetric=FALSE){
 
-#fitall <- fitallsave; fitall0=NULL;shrinkpara=NULL; modus="gauss"; shrinklc="PminMorgan0"; ntotal = 5000; 
-#maxsupport=8;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;
-#p0vec = c(0.5,0.8,0.9); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75);ncpus=6;refinegrid=FALSE;meansdauto=TRUE
+# fitall <- fitzinb3; fitall0=fitzinb03;shrinkpara="patmat"; modus="gauss"; ntotal = 10000;
+# maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
+# p0vec = c(0.5,0.8,0.9); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75);ncpus=6;refinegrid=FALSE;
+# meansdauto=TRUE; symmetric=TRUE
 if(is.null(shrinkpara) & is.null(shrinklc)) {
 print("PLEASE SPECIFY EITHER OF THE ARGUMENTS shrinkpara OR shrinklc")
 return(NULL)
@@ -205,9 +206,11 @@ meanest <- unlist(lapply(pxbeta, function(postdisti)
         } else {NULL}
     }))
 
+#for numerical stability
+difffun <- function(diff) return(min(20,max(diff,-20)))
+mlik0minmlik1 <- sapply(mlik0all-mlikall,difffun)
     
-    
-p0init <- min(0.98,mean(exp(mlik0all-mlikall)/(1+exp(mlik0all-mlikall))))
+p0init <- min(0.98,mean(exp(mlik0minmlik1)/(1+exp(mlik0minmlik1))))
 absmean <- abs(meanest)
 whsm <- which(absmean >= quantile(absmean,p0init))
 meansel <- meanest[whsm]

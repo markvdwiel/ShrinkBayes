@@ -1,6 +1,6 @@
 MixtureUpdatePosterior <-
 function(fitall, updateoutput, fitall0=NULL, ncpus=1){
-#fitall <- fitg;updateoutput<-prior;fitall0=NULL;ncpus=8
+#fitall <- fitgk22;updateoutput<-mixtprior;fitall0=NULL;ncpus=1
 #updateoutput<- mixtprior
 fitall <- fitall[[1]]
 if(!is.null(fitall0)){
@@ -71,6 +71,10 @@ mlik <- sapply(mlik,repNA)
 mlik0 <- sapply(mlik0,repNA)
 }
 
+difffun <- function(diff) return(min(20,max(diff,-20)))
+mlik0minmlik1 <- sapply(mlik0-mlik,difffun)
+
+
 rm(fitall)
 if(zerofit) rm(fitall0)
 gc()
@@ -81,7 +85,7 @@ gc()
 #if(length(whichna)>0){
 #    #postdist<-postdist[-whichna]
 #    pxbeta <- pxbeta[-whichna]
-#    mlik <- mlik[-whichna]
+#    mlik <-  mlik[-whichna]
 #    mlik0 <- mlik0[-whichna]
 #}
 
@@ -143,6 +147,7 @@ loglikall <- c()
 ntagcur <- length(pxbeta)
 pmt <- proc.time()
     tagfun <- function(tag){
+    #tag<-1  
     if(is.null(pxbeta[[tag]])) return(NULL) else {
      if(is.wholenumber(tag/500)) print(paste("Tag:",tag))
         #tag<-333
@@ -168,7 +173,7 @@ pmt <- proc.time()
             support <- pxbetatag[,1]
             finit <-dnorm(support,mean=mufiti,sd=1/sqrt(precfiti))
             if(modus=="gauss") {
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0[tag]-mlik[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
       
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*dnorm(x,mean=0,sd=stdev)/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0
@@ -176,7 +181,7 @@ pmt <- proc.time()
             }
             if(modus=="laplace") {
                 sc <- stdev/sqrt(2)
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0[tag]-mlik[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*dlaplace(x,location=0,scale=sc)/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0 
                 pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*dlaplace(support,location=0,scale=sc)
@@ -192,13 +197,15 @@ pmt <- proc.time()
 #                pwide*dnorm(support,mean=0,sd=sdwide))
 #            }
             if(modus=="mixt") {
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0[tag]-mlik[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*(pminus*dnorm(x,mean=-mu,sd=stdev) + (1-pminus)*dnorm(x,mean=mu,sd=stdev))/fxinit(x),marginal=pxbetatag)  
                 integral <- integral0 + integralnon0 
                 pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*(pminus*dnorm(support,mean=-mu,sd=stdev) + (1-pminus)*dnorm(support,mean=mu,sd=stdev))
             }
-            postbetanon0 <- pxbetatagweight/integral
-            if(p0!=0) postbeta0 <- integral0/integral else postbeta0 <- 0
+            if(p0 == 1) {postbeta0 <- 1; postbetanon0 <- rep(0,length(support))} else {
+              postbetanon0 <- pxbetatagweight/integral
+              if(p0!=0) postbeta0 <- integral0/integral else postbeta0 <- 0
+            }
             postbetanon0 <- cbind(support,postbetanon0)
             colnames(postbetanon0) <- c("x","y")
             postbetanon0all <- c(postbetanon0all,list(postbetanon0))       
