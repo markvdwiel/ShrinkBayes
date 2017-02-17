@@ -522,6 +522,10 @@ for(j in 1:lngene){
             repNA <- function(x) {if(is.na(x)) return(-10^10) else return(x)}
             mlik <- sapply(mlik,repNA)
             mlik0 <- sapply(mlik0,repNA)
+            
+            #added for numerical stability
+            mlik0 <- mlik + sapply(mlik0 - mlik,function(x) min(20,max(x,-20)))
+            
             maxlik <- as.numeric(apply(cbind(mlik,mlik0),1,max))
             p0start <- length(which((mlik0-mlik)>0))/length(mlik)
             

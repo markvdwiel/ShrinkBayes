@@ -364,7 +364,24 @@ for(j in 1:lngene){
             precerrprev <- precerr
             diracprobprev <- diracprob
             
-            if(is.null(excludefornull)) p0 <- 0
+            if(is.null(excludefornull)) p0 <- 0 else {
+              mlik <- mliks(fitall)
+              mlik0 <- mliks(fitall0)
+              repNA <- function(x) {if(is.na(x)) return(-10^10) else return(x)}
+              mlik <- sapply(mlik,repNA)
+              mlik0 <- sapply(mlik0,repNA)
+              
+              #added for numerical stability
+              mlik0 <- mlik + sapply(mlik0 - mlik,function(x) min(20,max(x,-20)))
+              
+              maxlik <- as.numeric(apply(cbind(mlik,mlik0),1,max))
+              p0start <- length(which((mlik0-mlik)>0))/length(mlik)
+              
+              liktot <- function(p0=0.5) {-sum(log(p0*exp(mlik0-maxlik) + (1-p0)*exp(mlik-maxlik)))}
+              #res1 <- mle(liktot,start=list(p0=p0start),lower=c(0.001),upper=c(0.999),hessian=FALSE,method="L-BFGS-B")
+              res2 <- optimize(liktot,lower=0,upper=1, maximum = FALSE) #seems more stable than mle
+              p0 <- res2$minimum        
+            }
             
              if(!is.null(shrinkfixed)) {
                 if(is.element(inputpar$shrinkfixed,excludefornull)) {
