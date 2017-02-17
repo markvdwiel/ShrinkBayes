@@ -311,7 +311,7 @@ pmt <- proc.time()
                 p0 <- gridd[grrow,1]
                 sdzero2<- gridd[grrow,2] 
                 #integral0 <- (pxbeta_eq0tag/f0init)*(p0)
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0all[tag]-mlikall[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*dnorm(x,mean=0,sd=sdzero2)/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0 
                 if(log(integral)>3) print(c(grrow,tag,i,log(integral)))
@@ -323,7 +323,7 @@ pmt <- proc.time()
                 resall <- sapply(1:ngrid,function(grrow){
                 p0 <- gridd[grrow,1]
                 sc <- gridd[grrow,2]/sqrt(2)
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0all[tag]-mlikall[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*dlaplace(x,location=0,scale=sc)/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0 
                 return(log(integral))
@@ -350,7 +350,7 @@ pmt <- proc.time()
                 p0 <- gridd[grrow,2]
                 mu <- gridd[grrow,3]
                 stdev <- gridd[grrow,4]
-                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0all[tag]-mlikall[tag])*p0
+                if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
                 integralnon0 <- myinla.expectation(function(x) (1-p0)*(pminus*dnorm(x,mean=-mu,sd=stdev) + 
                 (1-pminus)*dnorm(x,mean=mu,sd=stdev))/fxinit(x),marginal=pxbetatag)  
                 integral <- integral0 + integralnon0 
