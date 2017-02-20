@@ -16,7 +16,7 @@ if(allcontrasts & multvscontrol){
     cat("Set either \'allcontrasts\' or \'multvscontrol\' to FALSE\n")
     return(NULL)
     }
-form <- formula(paste("y",paste(as.character(form)[[1]],as.character(form)[[2]])))
+if(as.character(form)[[2]] !="y") form <- formula(paste("y",paste(as.character(form)[[1]],as.character(form)[[2]])))
 
 if(is.null(paramtotest)){ 
 frmchr <- as.character(form)[[3]]
