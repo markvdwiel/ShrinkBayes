@@ -1,5 +1,5 @@
 ShrinkBayesWrap <- function(data,form,paramtotest=NULL,allcontrasts=FALSE,multvscontrol=FALSE,fams=NULL,notfit=NULL,ncpus2use=8,
-priorsimple = FALSE,approx0=TRUE,diffthr=0,direction="two-sided",saveposteriors = TRUE, fileposteriors="Posteriors.Rdata",...){
+priorsimple = FALSE,approx0=TRUE,diffthr=0,direction="two-sided",saveposteriors = TRUE, fileposteriors="Posteriors.Rdata", sparse=FALSE,...){
 #testContrasts = FALSE, implies K-sample test for factor with more thatn 2 levels
 #paramtotest: defaults to first parameter in the model
 #notfit: indices of those features for which inference is not desired (e.g. because they did not survive a pre-filter)
@@ -10,6 +10,7 @@ priorsimple = FALSE,approx0=TRUE,diffthr=0,direction="two-sided",saveposteriors 
 #allcontrasts=FALSE;notfit=NULL;ncpus2use=4;approx0=TRUE;saveposteriors<-TRUE;fileposteriors<-"posteriors.RData";diffthr=0;direction="two-sided"
 #priorsimple <- TRUE
 #...:further arguments to pass on to ShinkSeq or ShrinkGauss
+if(sparse) fixed <- c(0,1)
 if(allcontrasts & multvscontrol){
     print("Cannot perform all-pairwise and multiple groups versus control comparisons simultaneously")
     cat("Set either \'allcontrasts\' or \'multvscontrol\' to FALSE\n")
@@ -86,9 +87,11 @@ cat("Argument \'direction\' is set to \"equal\" to allow K-sample testing\n")
 print("STARTING INITIAL SHRINKAGE")
 pmtinit <- proc.time()
 if(counts){
-    shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...)
+    if(!sparse) shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...) else 
+      shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,...)  
     } else {
-    shrinksimul <- ShrinkGauss(form=form, dat=data,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...)
+    if(!sparse) shrinksimul <- ShrinkGauss(form=form, dat=data,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...) else
+      shrinksimul <- ShrinkGauss(form=form,dat=data,fams=fams,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,...)  
     }
 time1 <- proc.time()-pmtinit
 print("Computing time for shrinkage:")
@@ -124,7 +127,8 @@ print("Computing time for initial fit:")
 print(time1)  
 
 print("START FITTING MIXTURE PRIOR")
-pmt <- proc.time()  
+pmt <- proc.time()
+if(sparse) prior <- MixtureUpdatePrior(fitall=fitg,fitall0=fitg0, modus="laplace", shrinkpara=paramtotest,shrinklc=shrinklc,ncpus=ncpus2use) else
     if(!priorsimple) prior <- MixtureUpdatePrior(fitall=fitg,fitall0=fitg0, modus="mixt", shrinkpara=paramtotest,shrinklc=shrinklc,ncpus=ncpus2use,symmetric=symmetric) else prior <- MixtureUpdatePrior(fitall=fitg,fitall0=fitg0, modus="gauss", shrinkpara=paramtotest,shrinklc=shrinklc,ncpus=ncpus2use)
 time1 <- proc.time()-pmt
 print("Computing time for fitting mixture prior:")

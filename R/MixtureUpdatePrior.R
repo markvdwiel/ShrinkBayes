@@ -1,13 +1,14 @@
 MixtureUpdatePrior <-
 function(fitall,fitall0=NULL, shrinkpara=NULL, modus="mixt", shrinklc=NULL,  lincombs=NULL,ntotal = 10000, maxsupport=6,pointmass=0,
-pminvec = c(0,0.25,0.5,0.75,1),p0vec = c(0.5,0.7,0.9,0.95,0.98,0.99,1), 
+pminvec = c(0,0.25,0.5,0.75,1), p0vec = c(0.5,0.7,0.9,0.95,0.99,0.999,1), 
 meanvec = c(0.1, 0.3, 0.5, 0.75,1.5),sdvec=c(0.2,0.5,0.8,1.5,3),meansdauto=TRUE,
 ncpus=2,refinegrid=TRUE, symmetric=FALSE){
 
-# fitall <- fitzinb3; fitall0=fitzinb03;shrinkpara="patmat"; modus="gauss"; ntotal = 10000;
-# maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
-# p0vec = c(0.5,0.8,0.9); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75);ncpus=6;refinegrid=FALSE;
-# meansdauto=TRUE; symmetric=TRUE
+# # 
+#  fitall <- fitzinb; fitall0=NULL;shrinkpara="patmat"; modus="laplace"; ntotal = 10000;
+#  maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
+#  p0vec = c(0.5,0.8,0.9,0.99,1); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75,1.5);ncpus=6;refinegrid=TRUE;
+#  meansdauto=TRUE; symmetric=TRUE
 if(is.null(shrinkpara) & is.null(shrinklc)) {
 print("PLEASE SPECIFY EITHER OF THE ARGUMENTS shrinkpara OR shrinklc")
 return(NULL)
@@ -187,6 +188,9 @@ if(is.null(shrinklc)) f0init <- dnorm(0,mean=muinit,sd=1/sqrt(precfit)) else f0i
 mlik0all <- log(unlist(pxbeta_eq0)/f0init) + mlikall
 }
 
+#for numerical stability; rationale is that the null-model can not have a log-marg lik > log-mark lik (full model) + 5; for numerical stability
+difffun <- function(diff) return(min(5,max(diff,-500)))
+mlik0minmlik1 <- sapply(mlik0all-mlikall,difffun)
 
 if(meansdauto){
 meanest <- unlist(lapply(pxbeta, function(postdisti)
@@ -206,9 +210,6 @@ meanest <- unlist(lapply(pxbeta, function(postdisti)
         } else {NULL}
     }))
 
-#for numerical stability
-difffun <- function(diff) return(min(20,max(diff,-20)))
-mlik0minmlik1 <- sapply(mlik0all-mlikall,difffun)
     
 p0init <- min(0.98,mean(exp(mlik0minmlik1)/(1+exp(mlik0minmlik1))))
 absmean <- abs(meanest)

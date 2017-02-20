@@ -1,7 +1,13 @@
 MixtureUpdatePosterior <-
-function(fitall, updateoutput, fitall0=NULL, ncpus=1){
-#fitall <- fitgk22;updateoutput<-mixtprior;fitall0=NULL;ncpus=1
+function(fitall, updateoutput, fitall0=NULL, ncpus=1, robustlarge=TRUE){
+#fitall <- fitzinb;fitall0<-fitzinb0;updateoutput<-mixtprior;ncpus=3
+#fitall <- fitzinb;fitall0<-NULL;updateoutput<-laplaceprior;ncpus=3;robustlarge=TRUE; sdlarge=5; plarge=0.001
 #updateoutput<- mixtprior
+  
+#updated 17.2.2017: add a small proportion of a flat Gaussian prior, if robustlarge=TRUE
+sdlarge<-5
+if(robustlarge) plarge<-0.001 else plarge <- 0 
+  
 fitall <- fitall[[1]]
 if(!is.null(fitall0)){
     fitall0 <- fitall0[[1]]
@@ -32,9 +38,6 @@ pointmass <- ip$pointmass
 
 
 if(!is.null(shrinkpara)){if(is.factor(try(get(shrinkpara),silent=TRUE))) shrinkpara <- fact2vec(shrinkpara)}
-
-
-
 
 callmode <- fitall[[1]]$call
 
@@ -69,10 +72,12 @@ mlik0 <- mliks(fitall0)
 repNA <- function(x) {if(is.na(x)) return(-10^10) else return(x)}
 mlik <- sapply(mlik,repNA)
 mlik0 <- sapply(mlik0,repNA)
+#for numerical stability; rationale is that the null-model can not have a log-marg lik > log-mark lik (full model) + 5; for numerical stability
+difffun <- function(diff) return(min(5,max(diff,-500)))
+mlik0minmlik1 <- sapply(mlik0-mlik,difffun)
 }
 
-difffun <- function(diff) return(min(20,max(diff,-20)))
-mlik0minmlik1 <- sapply(mlik0-mlik,difffun)
+
 
 
 rm(fitall)
@@ -150,7 +155,7 @@ pmt <- proc.time()
     #tag<-1  
     if(is.null(pxbeta[[tag]])) return(NULL) else {
      if(is.wholenumber(tag/500)) print(paste("Tag:",tag))
-        #tag<-333
+        #tag<-644
         #print(tag)
         postbetanon0all <- list()
         postbeta0all <- c()  
@@ -158,7 +163,7 @@ pmt <- proc.time()
         nm <- names(pxbeta[[tag]])
         if(!is.null(shrinklc)) whichlc <- which(!(nm %in% shrinkpara)) else whichlc <- NULL
         for(i in 1:length(pxbeta[[tag]])){
-        #tag<-1;i<-1
+        #tag<-644;i<-1
             if(!is.null(shrinklc) & is.element(i,whichlc)){
             precfiti <- precfitlc 
             mufiti <- mufitlc 
@@ -174,17 +179,16 @@ pmt <- proc.time()
             finit <-dnorm(support,mean=mufiti,sd=1/sqrt(precfiti))
             if(modus=="gauss") {
                 if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
-      
-                integralnon0 <- myinla.expectation(function(x) (1-p0)*dnorm(x,mean=0,sd=stdev)/fxinit(x),marginal=pxbetatag)
+                integralnon0 <- myinla.expectation(function(x) (1-p0)*((1-plarge)*dnorm(x,mean=0,sd=stdev)+plarge*dnorm(x,mean=0,sd=sdlarge))/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0
-                pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*dnorm(support,mean=0,sd=stdev)
+                pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*((1-plarge)*dnorm(support,mean=0,sd=stdev)+plarge*dnorm(support,mean=0,sd=sdlarge))
             }
             if(modus=="laplace") {
                 sc <- stdev/sqrt(2)
                 if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
-                integralnon0 <- myinla.expectation(function(x) (1-p0)*dlaplace(x,location=0,scale=sc)/fxinit(x),marginal=pxbetatag)
+                integralnon0 <- myinla.expectation(function(x) (1-p0)*((1-plarge)*dlaplace(x,location=0,scale=sc)+plarge*dnorm(x,mean=0,sd=sdlarge))/fxinit(x),marginal=pxbetatag)
                 integral <- integral0 + integralnon0 
-                pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*dlaplace(support,location=0,scale=sc)
+                pxbetatagweight <- (pxbetatag[,2]/finit)*(1-p0)*((1-plarge)*dlaplace(support,location=0,scale=sc)+plarge*dnorm(support,mean=0,sd=sdlarge))
             }
             #if(modus=="gammamixt") {
 #                ra <- mu/stdev^2
@@ -198,9 +202,9 @@ pmt <- proc.time()
 #            }
             if(modus=="mixt") {
                 if(!zerofit) integral0 <- (pxbeta_eq0tag/f0init)*(p0) else integral0 <- exp(mlik0minmlik1[tag])*p0
-                integralnon0 <- myinla.expectation(function(x) (1-p0)*(pminus*dnorm(x,mean=-mu,sd=stdev) + (1-pminus)*dnorm(x,mean=mu,sd=stdev))/fxinit(x),marginal=pxbetatag)  
+                integralnon0 <- myinla.expectation(function(x) (1-p0)*((1-plarge)*(pminus*dnorm(x,mean=-mu,sd=stdev) + (1-pminus)*dnorm(x,mean=mu,sd=stdev))+plarge*dnorm(x,mean=0,sd=sdlarge))/fxinit(x),marginal=pxbetatag)  
                 integral <- integral0 + integralnon0 
-                pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*(pminus*dnorm(support,mean=-mu,sd=stdev) + (1-pminus)*dnorm(support,mean=mu,sd=stdev))
+                pxbetatagweight <- (pxbetatag[,2]/finit)* (1-p0)*((1-plarge)*(pminus*dnorm(support,mean=-mu,sd=stdev) + (1-pminus)*dnorm(support,mean=mu,sd=stdev))+plarge*dnorm(support,mean=0,sd=sdlarge))
             }
             if(p0 == 1) {postbeta0 <- 1; postbetanon0 <- rep(0,length(support))} else {
               postbetanon0 <- pxbetatagweight/integral

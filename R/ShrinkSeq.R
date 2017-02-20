@@ -524,7 +524,7 @@ for(j in 1:lngene){
             mlik0 <- sapply(mlik0,repNA)
             
             #added for numerical stability
-            mlik0 <- mlik + sapply(mlik0 - mlik,function(x) min(20,max(x,-20)))
+            mlik0 <- mlik + sapply(mlik0 - mlik,function(x) min(40,max(x,-40)))
             
             maxlik <- as.numeric(apply(cbind(mlik,mlik0),1,max))
             p0start <- length(which((mlik0-mlik)>0))/length(mlik)
