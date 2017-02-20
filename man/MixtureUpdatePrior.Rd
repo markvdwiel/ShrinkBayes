@@ -10,7 +10,7 @@ prior by a symmetric mixture prior, which may be desirable for the main paramete
 }
 \usage{
 MixtureUpdatePrior(fitall,fitall0=NULL, shrinkpara=NULL, modus="mixt", shrinklc=NULL,  lincombs=NULL,ntotal = 10000, maxsupport=6,pointmass=0,
-pminvec = c(0,0.25,0.5,0.75,1),p0vec = c(0.5,0.7,0.9,0.95,0.98,0.99,1), 
+pminvec = c(0,0.25,0.5,0.75,1),p0vec = c(0.5,0.7,0.9,0.95,0.99,0.999,1), 
 meanvec = c(0.1, 0.3, 0.5, 0.75,1.5),sdvec=c(0.2,0.5,0.8,1.5,3),meansdauto=TRUE,
 ncpus=2,refinegrid=TRUE,symmetric=FALSE)
 }

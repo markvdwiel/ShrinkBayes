@@ -9,7 +9,7 @@ the \code{FitAllShrink()} function, the \code{MixtureUpdatePrior()} function, th
 \code{SummaryTable()} function.
 }
 \usage{
-ShrinkBayesWrap(data, form, paramtotest = NULL, allcontrasts = FALSE, multvscontrol = FALSE, fams = NULL, notfit = NULL, ncpus2use = 8, priorsimple = FALSE, approx0 = TRUE, diffthr = 0, direction = "two-sided", saveposteriors = TRUE, fileposteriors = "Posteriors.Rdata", ...)
+ShrinkBayesWrap(data, form, paramtotest = NULL, allcontrasts = FALSE, multvscontrol = FALSE, fams = NULL, notfit = NULL, ncpus2use = 8, priorsimple = FALSE, approx0 = TRUE, diffthr = 0, direction = "two-sided", saveposteriors = TRUE, fileposteriors = "Posteriors.Rdata", sparse=FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,7 +41,7 @@ Numeric vector of integers. Indices of data rows for which fitting is NOT requir
 Integer. Number of cpus to use for calculations.
 }
   \item{priorsimple}{
-Boolean. If \code{TRUE} a simple pointmass-Normal prior is fit instead of the default a mixture. 
+Boolean. If \code{TRUE} a simple pointmass-Normal prior is fit instead of the default a mixture (overruled by \code{sparse=TRUE)
 }
   \item{approx0}{
 Boolean. If \code{TRUE} Savage-Dickey approximation is used for the null model (faster).
@@ -58,7 +58,10 @@ if the null-hypothesis is of the form \dQuote{parameter = thr}, use \code{direct
 Boolean. If \code{TRUE} posterior distributions of the parameters of interest are saved.
 }
   \item{fileposteriors}{
-Character. Name of file containing the posterior distributions
+Character. Name of file containing the posterior distributions.
+}
+\item{sparse}{
+Boolean. If \code{TRUE} a point-mass-laplace mixture is used.
 }
   \item{\dots}{
 Further arguments passed on to \code{\link[ShrinkBayes]{ShrinkGauss}} (Gaussian data) or to \code{\link[ShrinkBayes]{ShrinkSeq}} (Counts).
@@ -72,7 +75,9 @@ it is essential to use all data. For final fitting, however, computing time can 
 can be large. Note that \code{direction} is automatically set to \code{equal} when multi-parameter inference is performed.
 Specification of further arguments is particularly useful for shrinking other parameters of the model than \code{paramtotest} and the 
 dispersion-related parameters (which are shrunken by default). In addition, the \code{ntag} and \code{maxiter} arguments (see 
-\code{\link[ShrinkBayes]{ShrinkSeq}} or \code{\link[ShrinkBayes]{ShrinkGauss}}) can be used to reduce computing time when testing.
+\code{\link[ShrinkBayes]{ShrinkSeq}} or \code{\link[ShrinkBayes]{ShrinkGauss}}) can be used to reduce computing time when testing. About \code{sparse}:
+in case one expects few very large effects, shrinkage to a simple Gaussian should be avoided, because this may over-shirnk those large effects. Hence, setting 
+\code{sparse=TRUE} shrinks to a point mass - Laplace prior. 
 }
 
 \value{

@@ -8,7 +8,7 @@ This function re-computes posteriors for (one class of) parameters from posterio
 obtained by \code{\link{MixtureUpdatePrior}}. 
 }
 \usage{
-MixtureUpdatePosterior(fitall, updateoutput, fitall0=NULL, ncpus = 1)
+MixtureUpdatePosterior(fitall, updateoutput, fitall0=NULL, ncpus = 1, robustlarge=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -27,9 +27,16 @@ An optional 2-component list object resulting from \code{\link[ShrinkBayes]{FitA
 \item{ncpus}{
 Integer.  The number of cpus to use for parallel computations.
 }
+
+\item{robustlarge}{
+Boolean. Add a small proportion of flat Gaussian prior to robustify results for large effects.
+}
+
 }
 \details{
-Rescaling of posteriors is used as described in Van de Wiel et al. (2012). 
+Rescaling of posteriors is used as described in Van de Wiel et al. (2012). About \code{robustlarge}: in rare cases 
+the fitted prior may mismatch extreme effects. For that we weigh the continuous part of the prior with a very small proportion (0.001) of 
+a fairly flat prior (central gaussian with sd=5). This has almost no effect for most posteriors, but renders a better posterior for extreme effects. 
 }
 \value{
 A list object with the same number of components as the first component of \code{fitall} (number of fits), 
