@@ -64,7 +64,7 @@ print("Performing regression-based test")
 
 form0 = replacerand0(form,paramtotest) 
 
-datasum <- sum(data[1:5,])
+datasum <- sum(data[1:5,], na.rm=TRUE)
 if(is.wholenumber(datasum)) {
 counts <- TRUE 
 if(is.null(fams)){
