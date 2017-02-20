@@ -61,7 +61,7 @@ Boolean. If \code{TRUE} posterior distributions of the parameters of interest ar
 Character. Name of file containing the posterior distributions.
 }
 \item{sparse}{
-Boolean. If \code{TRUE} a point-mass-laplace mixture is used.
+Boolean. If \code{TRUE} a point mass plus laplace mixture is used.
 }
   \item{\dots}{
 Further arguments passed on to \code{\link[ShrinkBayes]{ShrinkGauss}} (Gaussian data) or to \code{\link[ShrinkBayes]{ShrinkSeq}} (Counts).
@@ -77,7 +77,7 @@ Specification of further arguments is particularly useful for shrinking other pa
 dispersion-related parameters (which are shrunken by default). In addition, the \code{ntag} and \code{maxiter} arguments (see 
 \code{\link[ShrinkBayes]{ShrinkSeq}} or \code{\link[ShrinkBayes]{ShrinkGauss}}) can be used to reduce computing time when testing. About \code{sparse}:
 in case one expects few very large effects, shrinkage to a simple Gaussian should be avoided, because this may over-shirnk those large effects. Hence, setting 
-\code{sparse=TRUE} shrinks to a point mass - Laplace prior. 
+\code{sparse=TRUE} shrinks to a point mass plus Laplace prior. 
 }
 
 \value{
