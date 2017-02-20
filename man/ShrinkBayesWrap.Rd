@@ -41,7 +41,7 @@ Numeric vector of integers. Indices of data rows for which fitting is NOT requir
 Integer. Number of cpus to use for calculations.
 }
   \item{priorsimple}{
-Boolean. If \code{TRUE} a simple pointmass-Normal prior is fit instead of the default a mixture (overruled by \code{sparse=TRUE)
+Boolean. If \code{TRUE} a simple pointmass-Normal prior is fit instead of the default a mixture (overruled by \code{sparse=TRUE})
 }
   \item{approx0}{
 Boolean. If \code{TRUE} Savage-Dickey approximation is used for the null model (faster).
