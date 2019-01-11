@@ -159,7 +159,10 @@ form = ~ 1 + PM + timepos + chemo + organ + f(indiv)
 
 #TRY IT FOR FIRST 200 DATA ROWS. USE ADDITIONAL SHRINKAGE;
 #LIMIT ntag AND maxiter to save computing time; USE DEFAULTS FOR FINAL RUN
-SBmir <- ShrinkBayesWrap(mirseqnorm[1:200,],form,shrinkaddfixed=c("organ","chemo","timepos"),ntag=c(50,100),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
+SBmir200 <- ShrinkBayesWrap(mirseqnorm[1:200,],form,shrinkaddfixed=c("organ","chemo","timepos"),ntag=c(50,100),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
+
+#On all data
+SBmirall <- ShrinkBayesWrap(mirseqnorm,form,shrinkaddfixed=c("organ","chemo","timepos"),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
 }
 }
 
