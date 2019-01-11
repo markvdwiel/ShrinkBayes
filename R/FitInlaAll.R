@@ -4,6 +4,11 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
             updateby = 5000, ndigits = 5, addpackage = NULL, safemode = TRUE, 
             cf = NULL, ...) 
   {
+  # forms <- form;dat=dat;fams=fams;logdisp = c(0, 0.01); precerr = c(1, 10^(-5)); curvedispfun = NULL;
+  # logitp0 = c(0, 0.01); ncpus = 2;
+  # effoutput = TRUE; keepmargrand = FALSE; keepmarghyper = TRUE;
+  # setthreads1 = TRUE; showupdate = FALSE; silentINLA = 2L;
+  # updateby = 5000; ndigits = 5; addpackage = NULL; safemode = TRUE; cf = NULL
     print("NOTE: Warnings from INLA (eigenvalues, convergence, abort) can currently not be surpressed. Please ignore (generally)")
     cat("\n")
     if (setthreads1) 
@@ -14,8 +19,7 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
     if (length(fams == 1)) 
       fams <- rep(fams, ngene)
     if (is.null(cf)) 
-      cf <- list(prec.intercept = 0.001)
-    else cf <- c(cf, prec.intercept = 0.001)
+      cf <- list(prec.intercept = 0.001) else cf <- c(cf, prec.intercept = 0.001)
     form <- forms[[1]]
     frmchr <- as.character(form)[[3]]
     sp <- strsplit(frmchr, "\\+")
@@ -32,8 +36,7 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
         }
       }
       names(dfr) <- sp2
-    }
-    else dfr <- data.frame()
+    } else dfr <- data.frame()
     if (dim(dfr)[1] > 0) {
       elmiss <- length(which(is.na(dfr)))
       if (elmiss > 0) {
@@ -42,18 +45,16 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
       }
     }
     fitinlaseqi <- function(i, ...) {
+      #i<-1
       print(i)
       form <- forms[[i]]
       fam = fams[i]
       di <- as.numeric(dat[i, ])
-      if (dim(dfr)[1] == 0) 
-        dattag <- data.frame(y = di)
-      else dattag <- cbind(data.frame(y = di), dfr)
+      if (dim(dfr)[1] == 0) dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
       if (!is.null(curvedispfun)) {
         mulogdisp <- curvedispfun(log(sum(di)))
         logdispi <- logdisp + c(mulogdisp, 0)
-      }
-      else {
+      } else {
         logdispi <- logdisp
       }
       if (fam == "zinb") {
@@ -78,9 +79,12 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
         cd = list(hyper = list(prec = list(prior = "loggamma", 
                                            param = precerr)))
       }
+      INLA:::inla.dynload.workaround() #NEW 11-1-2019
       result <- try(inla(formula = form, family = faminla, 
                          data = dattag, control.family = cd, silent = silentINLA, 
                          control.fixed = cf, ...))
+      #mydfr <- data.frame(y=di,groupfac,batch,pers)
+      #result <- try(inla(formula = form, family = faminla, data = mydfr, control.family = cd, silent = silentINLA, control.fixed = cf))
       if (class(result) == "try-error") 
         result <- NULL
       if (is.null(result$mlik)) {
@@ -94,16 +98,15 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
           if (maxval > 10^5 & maxval <= 10^6) 
             di <- round(di/10)
           if (dim(dfr)[1] == 0) 
-            dattag <- data.frame(y = di)
-          else dattag <- cbind(data.frame(y = di), dfr)
+            dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
+          INLA:::inla.dynload.workaround() #NEW 11-1-2019
           result <- try(inla(formula = form, family = faminla, 
                              data = dattag, control.family = cd, silent = silentINLA, 
                              control.fixed = cf, ...))
         }
       }
       if (class(result) == "try-error") 
-        result <- NULL
-      else {
+        result <- NULL else {
         if (effoutput) {
           nm = names(result)
           todel <- c(".control.defaults", "control.inla", 
@@ -124,7 +127,10 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
                            how = "replace", classes = "matrix")
       }
       return(list(result))
-    }
+    } #END fitinlaseqi
+    #f1 <- fitinlaseqi(1)
+    
+    
     if (ncpus == 1 | ngene == 1) {
       results <- sapply(1:ngene, fitinlaseqi, ...)
     }
