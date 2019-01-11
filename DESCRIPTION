@@ -1,7 +1,7 @@
 Package: ShrinkBayes
 Type: Package
 Title: Bayesian analysis of high-dimensional omics data, either Gaussian or counts 
-Version: 2.13.4
+Version: 2.13.5
 Date: 2017-02-20
 Author: Mark A. van de Wiel
 Maintainer: Mark A. van de Wiel <mark.vdwiel@vumc.nl>
