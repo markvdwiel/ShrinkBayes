@@ -370,8 +370,7 @@ wh <- sample(1:ntag,ntagcur)
 reslogliks <- sapply(wh,tagfun) 
 #else { mysfExport(forceexport=c("pxbeta","pxbeta_eq0"),forceexclude=c("fitall","fitall0"))
 #print("Finished exporting")
-#reslogliks <- sfSapply(wh,tagfun)
-}
+#reslogliks <- sfSapply(wh,tagfun)}
 
 proc.time()-pmt
 total <- apply(reslogliks,1,sum)

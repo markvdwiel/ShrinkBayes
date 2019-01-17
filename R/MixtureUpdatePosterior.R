@@ -228,7 +228,6 @@ tagfuntry <- function(ind) {
     }
 #if(ncpus==1) 
 reslogliks <- lapply(1:ntagcur,tagfuntry) 
-#else {mysfExport(forceexport=c("pxbeta","pxbeta_eq0")) reslogliks <- sfLapply(1:ntagcur,tagfuntry)
-}
+#else {mysfExport(forceexport=c("pxbeta","pxbeta_eq0")) reslogliks <- sfLapply(1:ntagcur,tagfuntry)}
 return(reslogliks)
 } #END FUNCTION
