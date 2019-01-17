@@ -5,10 +5,10 @@ meanvec = c(0.1, 0.3, 0.5, 0.75,1.5),sdvec=c(0.2,0.5,0.8,1.5,3),meansdauto=TRUE,
 ncpus=2,refinegrid=TRUE, symmetric=FALSE){
 
 # # 
-#  fitall <- fitzinb; fitall0=NULL;shrinkpara="patmat"; modus="laplace"; ntotal = 10000;
-#  maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
-#  p0vec = c(0.5,0.8,0.9,0.99,1); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75,1.5);ncpus=6;refinegrid=TRUE;
-#  meansdauto=TRUE; symmetric=TRUE
+ fitall <- fitg; fitall0=fitg0;shrinkpara="groupsIG"; modus="gauss"; ntotal = 10000;
+ maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
+ p0vec = c(0.5,0.8,0.9,0.99,1); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75,1.5);ncpus=6;refinegrid=TRUE;
+ meansdauto=TRUE; symmetric=FALSE
 if(is.null(shrinkpara) & is.null(shrinklc)) {
 print("PLEASE SPECIFY EITHER OF THE ARGUMENTS shrinkpara OR shrinklc")
 return(NULL)
@@ -366,10 +366,11 @@ pmt <- proc.time()
     }
 set.seed(34523)
 wh <- sample(1:ntag,ntagcur)
-if(ncpus==1) reslogliks <- sapply(wh,tagfun) else {
-mysfExport(forceexport=c("pxbeta","pxbeta_eq0"),forceexclude=c("fitall","fitall0"))
-print("Finished exporting")
-reslogliks <- sfSapply(wh,tagfun)
+#if(ncpus==1) 
+reslogliks <- sapply(wh,tagfun) 
+#else { mysfExport(forceexport=c("pxbeta","pxbeta_eq0"),forceexclude=c("fitall","fitall0"))
+#print("Finished exporting")
+#reslogliks <- sfSapply(wh,tagfun)
 }
 
 proc.time()-pmt

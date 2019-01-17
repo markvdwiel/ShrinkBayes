@@ -226,9 +226,9 @@ tagfuntry <- function(ind) {
     tr <- try(tagfun(ind),silent=T)
     if(class(tr)=="try-error") return(NULL) else return(tr)
     }
-if(ncpus==1) reslogliks <- lapply(1:ntagcur,tagfuntry) else {
-mysfExport(forceexport=c("pxbeta","pxbeta_eq0"))
-reslogliks <- sfLapply(1:ntagcur,tagfuntry)
+#if(ncpus==1) 
+reslogliks <- lapply(1:ntagcur,tagfuntry) 
+#else {mysfExport(forceexport=c("pxbeta","pxbeta_eq0")) reslogliks <- sfLapply(1:ntagcur,tagfuntry)
 }
 return(reslogliks)
 } #END FUNCTION
