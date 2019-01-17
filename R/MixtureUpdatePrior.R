@@ -5,10 +5,10 @@ meanvec = c(0.1, 0.3, 0.5, 0.75,1.5),sdvec=c(0.2,0.5,0.8,1.5,3),meansdauto=TRUE,
 ncpus=2,refinegrid=TRUE, symmetric=FALSE){
 
 # # 
- fitall <- fitg; fitall0=fitg0;shrinkpara="groupsIG"; modus="gauss"; ntotal = 10000;
- maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
- p0vec = c(0.5,0.8,0.9,0.99,1); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75,1.5);ncpus=6;refinegrid=TRUE;
- meansdauto=TRUE; symmetric=FALSE
+ # fitall <- fitg; fitall0=fitg0;shrinkpara="groupsIG"; modus="gauss"; ntotal = 10000;
+ # maxsupport=6;pminvec=c(0.1,0.3,0.5);pointmass=0;lincombs <- NULL;shrinklc=NULL;
+ # p0vec = c(0.5,0.8,0.9,0.99,1); meanvec = c(0.1, 0.25, 0.4, 0.5, 0.75);sdvec=c(0.2,0.75,1.5);ncpus=6;refinegrid=TRUE;
+ # meansdauto=TRUE; symmetric=FALSE
 if(is.null(shrinkpara) & is.null(shrinklc)) {
 print("PLEASE SPECIFY EITHER OF THE ARGUMENTS shrinkpara OR shrinklc")
 return(NULL)
