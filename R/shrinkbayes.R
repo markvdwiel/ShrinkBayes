@@ -16,7 +16,7 @@ if(allcontrasts & multvscontrol){
     cat("Set either \'allcontrasts\' or \'multvscontrol\' to FALSE\n")
     return(NULL)
     }
-if(as.character(form)[[2]] !="y") form <- formula(paste("y",paste(as.character(form)[[1]],as.character(form)[[2]])))
+form <- formula(paste("y",paste(as.character(form)[[1]],as.character(form)[[2]])))
 
 if(is.null(paramtotest)){ 
 frmchr <- as.character(form)[[3]]
@@ -64,7 +64,7 @@ print("Performing regression-based test")
 
 form0 = replacerand0(form,paramtotest) 
 
-datasum <- sum(data[1:5,], na.rm=TRUE)
+datasum <- sum(data[1:5,])
 if(is.wholenumber(datasum)) {
 counts <- TRUE 
 if(is.null(fams)){
@@ -169,7 +169,7 @@ print("START COMPUTING SUMMARY STATISTICS, INCL FDR")
 pmt <- proc.time() 
 if(saveposteriors) save(posteriors,file=fileposteriors)
 #check names
-res <- SummaryTable(posteriors,BFDRthr=1,diffthr = diffthr,direction=direction,pointmass=0,ndigit=3,ncpus=ncpus2use)
+res <- SummaryTable(posteriors,BFDRthr=1,diffthr = diffthr,direction=direction,pointmass=0,ndigit=3,ncpus=1)
 if(!is.null(notfit)) res$index <- (1:nr)[-notfit][res$index]
 cn <- colnames(res)
 whBFDR <- grep("BFDR",cn)
