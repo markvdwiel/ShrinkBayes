@@ -14,7 +14,7 @@ univariate likelihoods: Poisson, negative binomial, zero-inflated negative binom
 \usage{
 FitAllShrink(forms, dat, shrinksimul, finalprior=FALSE, dispersefixed = 10, disperseaddfixed = 1, disperserandom = 1, maxprecfixed = 4, fams = "zinb", ncpus = 2, 
 effoutput = TRUE, keepmargrand = FALSE, keepmarghyper = TRUE, setthreads1 = TRUE, showupdate = FALSE, silentINLA = TRUE, updateby = 5000, 
-ndigits = 5, addpackage = NULL, safemode = TRUE, ...)
+ndigits = 5, addpackage = NULL, safemode = TRUE, designlist=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,7 +23,8 @@ Formula, or list of formulas the length of which equals the number of data rows.
 \code{\link[INLA]{f}} for specification of the model formula.
 }
   \item{dat}{
-Matrix or data frame containing the data. Rows are features, columns are samples. 
+Matrix, data frame or list containing the data. Rows are features, columns are samples. For lists: 
+each component represents a feature.
 }
   \item{shrinksimul}{
 A list object resulting from \code{\link[ShrinkBayes]{ShrinkSeq}} or \code{\link[ShrinkBayes]{ShrinkGauss}}
@@ -83,6 +84,11 @@ Character string. Additional package that you wish to export to slave nodes when
   \item{safemode}{
 Boolean. Only relevant for \code{fams="zinb"} or \code{fams="nb"}. If fitting fails, should it re-run in a safe mode?
 }
+
+\item{designlist}{
+List. Components are data frames containting the variables in \code{form}. Length of list should equal nr of features in \code{data}. If \code{NULL} design is assumed to be the same for all features (and inferred from \code{form})
+}
+  
   \item{\dots}{
 Further arguments passed on to \code{\link[INLA]{inla}}.
 }

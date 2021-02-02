@@ -9,12 +9,13 @@ the \code{FitAllShrink()} function, the \code{MixtureUpdatePrior()} function, th
 \code{SummaryTable()} function.
 }
 \usage{
-ShrinkBayesWrap(data, form, paramtotest = NULL, allcontrasts = FALSE, multvscontrol = FALSE, fams = NULL, notfit = NULL, ncpus2use = 8, priorsimple = FALSE, approx0 = TRUE, diffthr = 0, direction = "two-sided", saveposteriors = TRUE, fileposteriors = "Posteriors.Rdata", sparse=FALSE, ...)
+ShrinkBayesWrap(data, form, paramtotest = NULL, allcontrasts = FALSE, multvscontrol = FALSE, fams = NULL, notfit = NULL, ncpus2use = 8, priorsimple = FALSE, approx0 = TRUE, diffthr = 0, direction = "two-sided", saveposteriors = TRUE, fileposteriors = "Posteriors.Rdata", sparse=FALSE, designlist=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{data}{
-Matrix or data frame containing the data. Rows are features, columns are samples. 
+Matrix, data frame or list containing the data. Rows are features, columns are samples. For lists: 
+each component represents a feature.
 }
   \item{form}{
 Formula starting with \code{~}. See \code{\link[INLA]{inla}} and 
@@ -63,6 +64,11 @@ Character. Name of file containing the posterior distributions.
 \item{sparse}{
 Boolean. If \code{TRUE} a point mass plus laplace mixture is used.
 }
+\item{designlist}{
+List. Components are data frames containting the variables in \code{form}. Length of list should equal nr of features in \code{data}. If \code{NULL} design is assumed to be the same for all features (and inferred from \code{form})
+}
+
+
   \item{\dots}{
 Further arguments passed on to \code{\link[ShrinkBayes]{ShrinkGauss}} (Gaussian data) or to \code{\link[ShrinkBayes]{ShrinkSeq}} (Counts).
 See details. 
@@ -159,10 +165,7 @@ form = ~ 1 + PM + timepos + chemo + organ + f(indiv)
 
 #TRY IT FOR FIRST 200 DATA ROWS. USE ADDITIONAL SHRINKAGE;
 #LIMIT ntag AND maxiter to save computing time; USE DEFAULTS FOR FINAL RUN
-SBmir200 <- ShrinkBayesWrap(mirseqnorm[1:200,],form,shrinkaddfixed=c("organ","chemo","timepos"),ntag=c(50,100),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
-
-#On all data
-SBmirall <- ShrinkBayesWrap(mirseqnorm,form,shrinkaddfixed=c("organ","chemo","timepos"),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
+SBmir <- ShrinkBayesWrap(mirseqnorm[1:200,],form,shrinkaddfixed=c("organ","chemo","timepos"),ntag=c(50,100),maxiter=5,priorsimple=TRUE)  #2-sample testing for PM, with additional shrinkage for other fixed effects
 }
 }
 

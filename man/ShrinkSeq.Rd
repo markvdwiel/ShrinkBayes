@@ -19,7 +19,7 @@ ntag=ifelse(is.null(excludefornull),c(100,200,500,1000),c(1000)), ntagcurve = 50
 fixed = c(0, 1/10), addfixed = c(0, 1/10), randomprec = c(1,10^(-5)), addrandomprec = c(1,10^(-5)),
 logdisp = c(0, 0.01), diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2), logitp0 = c(0, 0.01), 
 fixedseed = TRUE, ndraw = 10000, safemode = TRUE, tol = ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01), 
-tolrand = 0.02, mliktol = 0.1, ...)
+tolrand = 0.02, mliktol = 0.1, designlist=NULL,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,8 +28,8 @@ Formula. See \code{\link[INLA]{inla}} and
 \code{\link[INLA]{f}} for specification of the model formula.
 }
   \item{dat}{
-Matrix or data frame containing the data. Rows are features, columns are samples. 
-
+Matrix, data frame or list containing the data. Rows are features, columns are samples. For lists: 
+each component represents a feature.
 }
   \item{fams}{
 Character string. Either equal to \code{"poisson"}, \code{"zip"} 
@@ -147,6 +147,11 @@ Numeric. Tolerance for the Kolmogorov-Smirnov distance between two succesive ite
 \item{mliktol}{
 Numeric. Relative tolerance in percentage between two succesive iterations for the total marginal likelihood. 
 }
+
+\item{designlist}{
+List. Components are data frames containting the variables in \code{form}. Length of list should equal nr of features in \code{data}. If \code{NULL} design is assumed to be the same for all features (and inferred from \code{form})
+}
+  
 
   \item{\dots}{
 Further arguments passed on to \code{\link[INLA]{inla}}. 

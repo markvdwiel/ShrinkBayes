@@ -13,7 +13,7 @@ MORE CONVENIENT WHEN SHRINKAGE PRIORS ARE USED.
 \usage{
 FitInlaAll(forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr = c(1,10^(-5)), curvedispfun = NULL, logitp0 = c(0, 0.01), 
 ncpus = 2, effoutput = TRUE, keepmargrand = FALSE, keepmarghyper = TRUE, setthreads1 = TRUE, 
-showupdate = FALSE, silentINLA = 2L, updateby = 5000, ndigits = 5, addpackage = NULL, safemode = TRUE, cf=NULL, ...)
+showupdate = FALSE, silentINLA = 2L, updateby = 5000, ndigits = 5, addpackage = NULL, safemode = TRUE, cf=NULL, designlist=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,7 +22,8 @@ Formula, or list of formulas the length of which equals the number of data rows.
 \code{\link[INLA]{f}} for specification of the model formula.
 }
   \item{dat}{
-Matrix or data frame containing the data. Rows are features, columns are samples. 
+Matrix, data frame or list containing the data. Rows are features, columns are samples. For lists: 
+each component represents a feature.
 }
   \item{fams}{
 Character string. Either equal to \code{"poisson"}, \code{"zip"} 
@@ -76,6 +77,12 @@ Boolean. Only relevant for \code{fams="zinb"} or \code{fams="nb"}. If fitting fa
 }
 \item{cf}{List. \code{\link[INLA]{control.fixed}} argument for \code{\link[INLA]{inla}}.
 }
+
+\item{designlist}{
+List. Components are data frames containting the variables in \code{form}. Length of list should equal nr of features in \code{data}. If \code{NULL} design is assumed to be the same for all features (and inferred from \code{form})
+}
+  
+
   \item{\dots}{
 Further arguments passed on to \code{\link[INLA]{inla}}.
 }

@@ -19,7 +19,7 @@ shrinkaddfixed = NULL, shrinkrandom = NULL, shrinkaddrandom=NULL, shrinksigma = 
 mixtrand = FALSE, excludefornull=NULL, fixedmeanzero = FALSE, addfixedmeanzero = TRUE, 
 ntag=ifelse(is.null(excludefornull),c(100,200,500,1000),c(1000)), fixed = c(0, 1/10), addfixed = c(0, 1/10), 
 randomprec = c(1,10^(-5)),addrandomprec = c(1,10^(-5)), precerr = c(1,10^(-5)), diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2), fixedseed = TRUE, ndraw = 10000, 
-safemode = TRUE, tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01), tolrand = 0.02,  mliktol = 0.1, ...)
+safemode = TRUE, tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01), tolrand = 0.02,  mliktol = 0.1, designlist=NULL,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,7 +28,8 @@ Formula. See \code{\link[INLA]{inla}} and
 \code{\link[INLA]{f}} for specification of the model formula.
 }
   \item{dat}{
-Matrix or data frame containing the data. Rows are features, columns are samples. 
+Matrix, data frame or list containing the data. Rows are features, columns are samples. For lists: 
+each component represents a feature.
 }
   \item{maxiter}{
 Integer. The maximum number of iterations in the iterative marginal procedure}
@@ -117,6 +118,10 @@ Numeric. Tolerance for the Kolmogorov-Smirnov distance between two succesive ite
 
 \item{mliktol}{
 Numeric. Relative tolerance in percentage between two succesive iterations for the total marginal likelihood. 
+}
+
+\item{designlist}{
+List. Components are data frames containting the variables in \code{form}. Length of list should equal nr of features in \code{data}. If \code{NULL} design is assumed to be the same for all features (and inferred from \code{form})
 }
   
   \item{\dots}{
