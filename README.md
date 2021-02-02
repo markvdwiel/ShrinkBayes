@@ -1,4 +1,6 @@
 # ShrinkBayes
+Updated 2-2-2012: ShrinkBayes can now deal with different designs (and different number of data points) per feature
+
 R package for differential expression: sequencing counts (RNAseq), microarrays, and HTRNAi
 
 This package corresponds to the papers:
