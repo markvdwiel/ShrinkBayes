@@ -1,14 +1,14 @@
 ShrinkBayesWrap <- function(data,form,paramtotest=NULL,allcontrasts=FALSE,multvscontrol=FALSE,fams=NULL,notfit=NULL,ncpus2use=8,
-priorsimple = FALSE,approx0=TRUE,diffthr=0,direction="two-sided",saveposteriors = TRUE, fileposteriors="Posteriors.Rdata", sparse=FALSE,...){
+priorsimple = FALSE,approx0=TRUE,diffthr=0,direction="two-sided",saveposteriors = TRUE, fileposteriors="Posteriors.Rdata", sparse=FALSE,designlist=NULL,...){
 #testContrasts = FALSE, implies K-sample test for factor with more thatn 2 levels
 #paramtotest: defaults to first parameter in the model
 #notfit: indices of those features for which inference is not desired (e.g. because they did not survive a pre-filter)
 #other parameters to feed to ShrinkSeq or ShrinkGauss
 #Number of cpus to use in (parallel) computations
 #form: right side of formula object only
-#group <- factor(c(rep("group1",4),c(rep("group2",4))));data(datsim);data <- datsim;form = ~ 1 + group;paramtotest=NULL;multvscontrol<-FALSE;
-#allcontrasts=FALSE;notfit=NULL;ncpus2use=4;approx0=TRUE;saveposteriors<-TRUE;fileposteriors<-"posteriors.RData";diffthr=0;direction="two-sided"
-#priorsimple <- TRUE
+# group <- factor(c(rep("group1",4),c(rep("group2",4))));data(datsim);data <- datsim[1:50,];form = ~ 1 + group;paramtotest=NULL;multvscontrol<-FALSE;
+# allcontrasts=FALSE;notfit=NULL;ncpus2use=1;approx0=TRUE;saveposteriors<-TRUE;fileposteriors<-"posteriors.RData";diffthr=0;direction="two-sided"
+# priorsimple <- TRUE;sparse<-FALSE; designlist<- NULL
 #...:further arguments to pass on to ShinkSeq or ShrinkGauss
 if(sparse) fixed <- c(0,1)
 if(allcontrasts & multvscontrol){
@@ -63,8 +63,7 @@ print("Performing regression-based test")
 }
 
 form0 = replacerand0(form,paramtotest) 
-
-datasum <- sum(data[1:5,])
+if(class(data)[1] =="list")  datasum <- sum(unlist(data[1:5])) else datasum <- sum(data[1:5,])
 if(is.wholenumber(datasum)) {
 counts <- TRUE 
 if(is.null(fams)){
@@ -87,17 +86,18 @@ cat("Argument \'direction\' is set to \"equal\" to allow K-sample testing\n")
 print("STARTING INITIAL SHRINKAGE")
 pmtinit <- proc.time()
 if(counts){
-    if(!sparse) shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...) else 
-      shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,...)  
+    if(!sparse) shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,designlist=designlist,...) else 
+      shrinksimul <- ShrinkSeq(form=form,dat=data,fams=fams,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,designlist=designlist,...)  
     } else {
-    if(!sparse) shrinksimul <- ShrinkGauss(form=form, dat=data,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,...) else
-      shrinksimul <- ShrinkGauss(form=form,dat=data,fams=fams,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,...)  
+    if(!sparse) shrinksimul <- ShrinkGauss(form=form, dat=data,shrinkfixed=paramtotest, ncpus=ncpus2use,excludefornull=excludefornull,designlist=designlist,...) else
+      shrinksimul <- ShrinkGauss(form=form,dat=data,shrinkfixed=NULL, ncpus=ncpus2use,excludefornull=excludefornull,fixed=fixed,designlist=designlist,...)  
     }
 time1 <- proc.time()-pmtinit
 print("Computing time for shrinkage:")
 print(time1)
 
-nr <- nrow(data)
+if(class(data)[1] =="list") nr <- length(data) else nr <- nrow(data) #NEW
+
 nrfit <- nr - length(notfit)
 
 
@@ -112,11 +112,14 @@ if(!Ksam){
         }
 
 print("STARTING INITIAL FIT")
+if(class(data)[1] =="list") dat <- data[rows] else dat <- data[rows,] #NEW
+designlistr <- designlist[rows]
+
 pmt <- proc.time()
-    fitg <- FitAllShrink(form,dat=data[rows,],fams=fams,shrinksimul,ncpus=ncpus2use,lincomb=lincombvec)
+    fitg <- FitAllShrink(form,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,lincomb=lincombvec,designlist=designlistr )
     
     if(!approx0){
-        fitg0 <- FitAllShrink(form0,dat=data[rows,],fams=fams,shrinksimul,ncpus=ncpus2use)
+        fitg0 <- FitAllShrink(form0,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,designlist=designlistr)
     } else {
         print("Approximating marginal likelihood for null model by Savage-Dickey")
         cat("Set \'approx0 <- FALSE\' when this is not desired.\n")
@@ -137,9 +140,11 @@ print(time1)
 print("START FITTING FOR ALL FEATURES")
 pmt <- proc.time()  
     if(!is.null(notfit) & !skip){
-        fitg <- FitAllShrink(form,dat=data[-notfit,],fams=fams,shrinksimul,ncpus=ncpus2use,lincomb=lincombvec)
+      if(class(data)[1] =="list") dat <- data[-notfit] else dat <- data[-notfit,] #NEW
+      designlistn <- designlist[-notfit]
+        fitg <- FitAllShrink(form,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,lincomb=lincombvec,designlist=designlistn)
         if(!approx0 | allcontrasts){
-            fitg0 <- FitAllShrink(form0,dat=data[-notfit,],fams=fams,shrinksimul,ncpus=ncpus2use)
+            fitg0 <- FitAllShrink(form0,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,designlist=designlistn)
         } else {
             print("Approximating marginal likelihood for null model by Savage-Dickey")
             cat("Set \'approx0 <- FALSE\' when this is not desired.\n")
@@ -157,8 +162,10 @@ print(time1)
     if(is.null(notfit)) rows <- 1:nr else rows <- (1:nr)[-notfit]
     print("START FITTING FOR ALL FEATURES")
     pmt <- proc.time()  
-    fitg <- FitAllShrink(form,dat=data[rows,],fams=fams,shrinksimul,ncpus=ncpus2use,finalprior=TRUE)
-    fitg0 <- FitAllShrink(form0,dat=data[rows,],fams=fams,shrinksimul,ncpus=ncpus2use,finalprior=TRUE)
+    if(class(data)[1] =="list") dat <- data[-notfit] else dat <- data[-notfit,] #NEW
+    designlistn <- designlist[-notfit]
+    fitg <- FitAllShrink(form,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,finalprior=TRUE,designlist=designlistn)
+    fitg0 <- FitAllShrink(form0,dat=dat,fams=fams,shrinksimul,ncpus=ncpus2use,finalprior=TRUE,designlist=designlistn)
     posteriors <- BFUpdatePosterior(fitg,shrinksimul,fitg0)
     prior <- NULL
     time1 <- proc.time()-pmt

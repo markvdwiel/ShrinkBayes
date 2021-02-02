@@ -4,7 +4,7 @@ shrinkfixed=NULL,shrinkaddfixed=NULL,shrinkrandom=NULL,shrinkaddrandom=NULL,shri
 ntag=ifelse(is.null(excludefornull),c(100,200,500,1000),c(1000)),fixed = c(0,1/10), addfixed = c(0,1/10),randomprec = c(1,10^(-5)), addrandomprec=c(1,10^(-5)),precerr =c(1,10^(-5)),
 diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2), 
 fixedseed = TRUE, ndraw = 10000, safemode=TRUE, tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01), 
-tolrand = 0.02, mliktol = 0.1,...) { 
+tolrand = 0.02, mliktol = 0.1, designlist=NULL, ...) { 
 
 #form: see INLA manual. And examples therein 
 #maxiter: maximum number of iterations per cycle
@@ -34,13 +34,13 @@ tolrand = 0.02, mliktol = 0.1,...) {
 #fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01); 
 #tolrand = 0.02; mliktol = 0.1
 
-#form=form; dat=datsim;shrinkfixed="group"; ncpus=2;maxiter=2;ntag=c(10);shrinkrandom="r1";shrinkaddrandom=c("r2");
-#excludefornull = NULL; ncpus=1; maxiter=2;
-#shrinksigma=TRUE;mixtrand=FALSE;fixedmeanzero=FALSE;addfixedmeanzero=TRUE;
-#fixed = c(0,1/10); addfixed = c(0,1/10);randomprec = c(1,10^(-5));addrandomprec =c(1,10^(-5));  precerr =c(1,10^(-5));
-#diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2); 
-#fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01); 
-#tolrand = 0.02; mliktol = 0.1
+# form=form; dat=datsim[1:50,];shrinkfixed="group"; shrinkaddfixed <- NULL; ncpus=2;maxiter=2;ntag=c(10);shrinkrandom=NULL;shrinkaddrandom=NULL;
+# excludefornull = NULL; ncpus=1; maxiter=2;
+# shrinksigma=TRUE;mixtrand=FALSE;fixedmeanzero=FALSE;addfixedmeanzero=TRUE;
+# fixed = c(0,1/10); addfixed = c(0,1/10);randomprec = c(1,10^(-5));addrandomprec =c(1,10^(-5));  precerr =c(1,10^(-5));
+# diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2);
+# fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01);
+# tolrand = 0.02; mliktol = 0.1;designlist=NULL
 
 
 #### here starts function
@@ -98,11 +98,11 @@ names(inputpar) <- c("form", "shrinkfixed", "shrinkaddfixed", "shrinkrandom","sh
 diracprob <- c(diracprob0,1-diracprob0)
 
 
-ntagtot <- nrow(dat)
+if(class(dat)[1] =="list")  ntagtot <- ntagtotal <- length(dat) else ntagtot <- ntagtotal <- nrow(dat) #NEW
 fams <- rep("gaussian",ntagtot)
 
 lngene<-length(ntag)
-ntagtotal <- nrow(dat)
+#ntagtotal <- nrow(dat) #NEW
 wh2large <- which(ntag > ntagtotal)
 if(length(wh2large)>0){
 ntag <- c(ntag[-wh2large],ntagtotal)
@@ -174,7 +174,8 @@ for(j in 1:lngene){
             sel <- c(sel,sample(wh,nsample))
             }
         }
-    datshrinkj <- dat[sel,]  
+    if(class(dat)[1] =="list") datshrinkj <- dat[sel] else datshrinkj <- dat[sel,]   #NEW
+    designlistj <- designlist[sel] #NEW
     famsj <- fams[sel]
         
     
@@ -248,11 +249,11 @@ for(j in 1:lngene){
             repNA <- function(x) {if(is.na(x)) return(-10^10) else return(x)}
 
             
-            fitall <- FitInlaAll(form,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),...)
+            fitall <- FitInlaAll(form,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F), designlist=designlistj, ...) #NEW
             #fitall <- FitInlaAll(form,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F)) 
             mliksall <- mliks(fitall)
             if(mixtrand) {
-                fitallrand0 <- FitInlaAll(formrand0,datshrinkj, precerr=precerr,control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,...)      
+                fitallrand0 <- FitInlaAll(formrand0,datshrinkj, precerr=precerr,control.compute=list(dic=F, mlik=T, cpo=F),cf=cf, designlist=designlistj, ...)      #NEW
                 mliksall0 <- mliks(fitallrand0) 
                 if(!is.null(shrinkfixed)) postfixed <- fitinlacombine(list(fitallrand0,fitall),probs=diracprob, modus="fixed",para=shrinkfixed,nsam=nsamtagfixed,safemode=safemode)
                 if(!is.null(shrinkaddfixed)) {
@@ -279,7 +280,7 @@ for(j in 1:lngene){
             } 
             
             if(!is.null(excludefornull)) {
-                fitall0 <- FitInlaAll(form0,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),...)   
+                fitall0 <- FitInlaAll(form0,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),designlist=designlistj,...)   #NEW
                 #fitall0 <- FitInlaAll(form0,datshrinkj,famsj, precerr=precerr, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),ndigits=5)   
                 mliksall0 <- mliks(fitall0)
                 if(!is.null(shrinkfixed)) postfixed <- fitinlacombine(list(fitall0,fitall),probs=diracprob, modus="fixed",para=shrinkfixed,nsam=nsamtagfixed,safemode=safemode)

@@ -1,7 +1,7 @@
 FitAllShrink <-
 function(forms,dat,shrinksimul,finalprior=FALSE,dispersefixed=10, disperseaddfixed=1, disperserandom = 1, maxprecfixed=4, fams="zinb", ncpus = 
 2, effoutput =TRUE, keepmargrand = FALSE, keepmarghyper=TRUE, setthreads1=TRUE,showupdate=FALSE,silentINLA=TRUE,updateby=5000,ndigits=5,
-addpackage = NULL, safemode=TRUE,...){
+addpackage = NULL, safemode=TRUE, designlist=NULL, ...){
 #maxprecfixed: the maximum allowed precision in the prior for the main fixed parameter for fitting; useful when the 
 #precision estimate of the simultaneous procedure is extremely high 
 #forms = formTM;dat=mirnorm[whsig,];shrinksimul=shrinksimul
@@ -93,7 +93,7 @@ print("You may want to abort this computation and continu with the results from 
 toret <- FitInlaAll(form_shr,dat, fams=fams, logdisp = logdisp_shr, precerr = precerr_shr, curvedispfun=curvedispfun, logitp0=logitp0_shr, 
 ncpus = ncpus, effoutput = effoutput, keepmargrand = keepmargrand, keepmarghyper=keepmarghyper, setthreads1=setthreads1,
 showupdate=showupdate, silentINLA=silentINLA, updateby=updateby,ndigits=ndigits,
-addpackage = addpackage, cf=cf, safemode=safemode, ...)
+addpackage = addpackage, cf=cf, safemode=safemode, designlist=designlist, ...)
 priors <- list(mufixed=mufixed,precfixed=precfixeddisp,addfixed=addfixed,addrandom=addrandom,shaperand = randeff_shr[1],raterand=randeff_shr[2],
 mudisp = logdisp_shr[1],precdisp = logdisp_shr[2],mup0 = logitp0_shr[1],precp0 = logitp0_shr[2], shapeerr = precerr_shr[1], rateerr = precerr_shr[2],
 finalprior=finalprior)

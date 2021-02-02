@@ -1,19 +1,27 @@
-FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr = c(1, 10^(-5)), curvedispfun = NULL, logitp0 = c(0, 0.01), ncpus = 2, 
+FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr = c(1, 10^(-5)), curvedispfun = NULL, 
+                        logitp0 = c(0, 0.01), ncpus = 2, 
             effoutput = TRUE, keepmargrand = FALSE, keepmarghyper = TRUE, 
             setthreads1 = TRUE, showupdate = FALSE, silentINLA = 2L, 
             updateby = 5000, ndigits = 5, addpackage = NULL, safemode = TRUE, 
-            cf = NULL, ...) 
+            cf = NULL, designlist=NULL, ...) 
   {
-  # forms <- form;dat=dat;fams=fams;logdisp = c(0, 0.01); precerr = c(1, 10^(-5)); curvedispfun = NULL;
-  # logitp0 = c(0, 0.01); ncpus = 2;
+  # forms <- formb;dat=datsim[1:3,];fams="gaussian";logdisp = c(0, 0.01); precerr = c(1, 10^(-5)); curvedispfun = NULL;
+  # logitp0 = c(0, 0.01); ncpus = 1;
   # effoutput = TRUE; keepmargrand = FALSE; keepmarghyper = TRUE;
   # setthreads1 = TRUE; showupdate = FALSE; silentINLA = 2L;
   # updateby = 5000; ndigits = 5; addpackage = NULL; safemode = TRUE; cf = NULL
+  # 
+  # dat <- lapply(1:nrow(datsim[1:3,]),function(i) datsim[i,])
+  # designlist <- lapply(1:nrow(datsim[1:3,]),function(i) group)
+  
+  
+  
     print("NOTE: Warnings from INLA (eigenvalues, convergence, abort) can currently not be surpressed. Please ignore (generally)")
     cat("\n")
     if (setthreads1) 
       inla.setOption("num.threads", 1)
-    ngene <- nrow(dat)
+    if(class(dat)[1] =="list")  ngene <- length(dat) else ngene <- nrow(dat) #NEW
+    
     if (mode(forms) == "call") 
       forms <- rep(list(forms), ngene)
     if (length(fams == 1)) 
@@ -21,6 +29,10 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
     if (is.null(cf)) 
       cf <- list(prec.intercept = 0.001) else cf <- c(cf, prec.intercept = 0.001)
     form <- forms[[1]]
+    
+    
+  #creates design from formula if designlist is unknown 
+  if(is.null(designlist)){ 
     frmchr <- as.character(form)[[3]]
     sp <- strsplit(frmchr, "\\+")
     sp <- as.vector(sapply(sp, function(tt) {
@@ -44,13 +56,20 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
         return(NULL)
       }
     }
+  }
     fitinlaseqi <- function(i, ...) {
       #i<-1
       print(i)
       form <- forms[[i]]
       fam = fams[i]
-      di <- as.numeric(dat[i, ])
-      if (dim(dfr)[1] == 0) dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
+      if(class(dat)[1] == "list") di <- as.numeric(dat[[i]]) else di <- as.numeric(dat[i, ])
+      
+      if(is.null(designlist)) {
+        if (dim(dfr)[1] == 0) dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
+        } else { #design is different per tag
+        dfr <- designlist[[i]]
+        dattag <- cbind(data.frame(y = di), dfr)
+      }
       if (!is.null(curvedispfun)) {
         mulogdisp <- curvedispfun(log(sum(di)))
         logdispi <- logdisp + c(mulogdisp, 0)
@@ -97,8 +116,12 @@ FitInlaAll <- function (forms, dat, fams = "zinb", logdisp = c(0, 0.01), precerr
             di <- round(di/100)
           if (maxval > 10^5 & maxval <= 10^6) 
             di <- round(di/10)
-          if (dim(dfr)[1] == 0) 
-            dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
+          if(is.null(designlist)) {
+            if (dim(dfr)[1] == 0) dattag <- data.frame(y = di) else dattag <- cbind(data.frame(y = di), dfr)
+          } else { #design is different per tag
+            dfr <- designlist[[i]]
+            dattag <- cbind(data.frame(y = di), dfr)
+          }
           INLA:::inla.dynload.workaround() #NEW 11-1-2019
           result <- try(inla(formula = form, family = faminla, 
                              data = dattag, control.family = cd, silent = silentINLA, 

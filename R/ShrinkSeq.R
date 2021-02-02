@@ -3,7 +3,7 @@ shrinkfixed=NULL,shrinkaddfixed=NULL,shrinkrandom=NULL,shrinkaddrandom=NULL,shri
 mixtrand=FALSE,excludefornull=NULL,fixedmeanzero=FALSE, addfixedmeanzero=TRUE,curvedisp=FALSE, maxiter=15, ntag=ifelse(is.null(excludefornull),c(100,200,500,1000),c(1000)), ntagcurve=5000, fixed = c(0,1/10), 
 addfixed = c(0,1/10), randomprec = c(1,10^(-5)),addrandomprec=c(1,10^(-5)), logdisp = c(0,0.01),diracprob0=ifelse((mixtrand | !is.null(excludefornull)), 0.8, 0.2),logitp0 = 
 c(0,0.01), fixedseed = TRUE, ndraw = 10000, safemode=TRUE, tol=ifelse((mixtrand | !is.null(excludefornull)),0.005,0.01), 
-tolrand = 0.02, mliktol = 0.1, ...) { 
+tolrand = 0.02, mliktol = 0.1, designlist=NULL, ...) { 
 
 ##
 #form = y ~ biopt2 + f(pers) + f(tissue) + deltapos + chemo;dat=mirnorm;shrinkfixed="biopt2";shrinkaddfixed=c("deltapos","chemo"); fams="zinb"; 
@@ -26,20 +26,20 @@ tolrand = 0.02, mliktol = 0.1, ...) {
 #fixedseed = TRUE; ndraw = 10000; safemode=TRUE;ncpus2use <- 2;excludefornull="organ";mliktol=0.1
 
 
-
-#fams="zinb"; dat=CAGEdata; shrinkaddfixed=NULL;shrinkdisp=TRUE;shrinkp0=FALSE;mixtdisp=FALSE;mixtrand=FALSE;excludefornull=NULL;fixedmeanzero=FALSE; 
-#addfixedmeanzero=TRUE;curvedisp=FALSE; maxiter=15; ntagcurve=5000; fixed = c(0,1/10); addfixed = c(0,1/10); randomprec = 
-#c(1,10^(-5)); logdisp = c(0,0.01);diracprob0=0.8;logitp0 = 
-#c(0,0.01); fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=0.005;
-#tolrand = 0.02; mliktol = 0.1;
-#form=form; dat=CAGEdata;shrinkfixed="groupfac";shrinkrandom="pers";ncpus=8;
-#maxiter=1;mixtrand=TRUE;ntag=c(50,100)
-#
-#fams="zinb"; dat=cl.4; shrinkaddfixed=NULL;shrinkdisp=TRUE;shrinkp0=FALSE;mixtdisp=FALSE;mixtrand=FALSE;excludefornull=NULL;fixedmeanzero=FALSE; 
-#addfixedmeanzero=TRUE;curvedisp=TRUE; maxiter=15; ntagcurve=500; fixed = c(0,1/10); addfixed = c(0,1/10); randomprec = 
-#c(1,10^(-5)); logdisp = c(0,0.01);diracprob0=0.8;logitp0 = 
-#c(0,0.01); fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=0.005;
-#tolrand = 0.02; mliktol = 0.1;
+# 
+# fams="zinb"; form = y ~ 1 + groupfac + batch + f(pers,model="iid"); dat=CAGEdata; shrinkaddfixed=NULL;shrinkaddrandom=NULL;shrinkdisp=TRUE;shrinkp0=FALSE;mixtdisp=FALSE;mixtrand=FALSE;excludefornull=NULL;fixedmeanzero=FALSE;
+# addfixedmeanzero=TRUE;curvedisp=FALSE; maxiter=15; ntagcurve=5000; fixed = c(0,1/10); addfixed = c(0,1/10); randomprec =
+# c(1,10^(-5)); addrandomprec=c(1,10^(-5));logdisp = c(0,0.01);diracprob0=0.8;logitp0 =
+# c(0,0.01); fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=0.005;
+# tolrand = 0.02; mliktol = 0.1;
+# maxiter=1;mixtrand=FALSE;ntag=c(50,100)
+# #
+# fams="zinb"; dat=cl.4; shrinkaddfixed=NULL;shrinkdisp=TRUE;shrinkp0=FALSE;mixtdisp=FALSE;mixtrand=FALSE;excludefornull=NULL;fixedmeanzero=FALSE;
+# addfixedmeanzero=TRUE;curvedisp=TRUE; maxiter=15; ntagcurve=500; fixed = c(0,1/10); addfixed = c(0,1/10); randomprec =
+# c(1,10^(-5)); logdisp = c(0,0.01);diracprob0=0.8;logitp0 =
+# c(0,0.01); fixedseed = TRUE; ndraw = 10000; safemode=TRUE; tol=0.005;
+# tolrand = 0.02; mliktol = 0.1;
+  
 #form=f.4; dat=cl.4;shrinkfixed="g.4";shrinkrandom=NULL;ncpus=8;
 #maxiter=1;ntag=c(50,100)
 #form=f.4, dat=cl.4, fams="nb", shrinkfixed="g.4", curvedisp=T, ncpus=4
@@ -138,12 +138,13 @@ diracprob <- c(diracprob0,1-diracprob0)
 
 
 #### here starts function
-ntagtot <- nrow(dat)
+if(class(dat)[1] =="list")  ntagtot <- ntagtotal <- length(dat) else ntagtot <- ntagtotal <- nrow(dat) #NEW
+
 
 if (length(fams)==1) fams <- rep(fams,ntagtot)
 
 
-ntagtotal <- nrow(dat)
+#ntagtotal <- nrow(dat)
 wh2large <- which(ntag >= ntagtotal)
 if(length(wh2large)>0){
 ntag <- c(ntag[-wh2large],ntagtotal)
@@ -217,10 +218,11 @@ print(paste("Fitting curve based on",ntagcurve,"observations"))
             sel <- c(sel,sample(wh,nsample))
             }
         }
-    datshrinkj <- dat[sel,]  
+    if(class(dat)[1] =="list") datshrinkj <- dat[sel] else datshrinkj <- dat[sel,]   #NEW
+    designlistj <- designlist[sel] #NEW
     famsj <- fams[sel]
     #fitallinit <- FitInlaAll(form,datshrinkj,famsj, logdisp, logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),curvedispfun=NULL)
-    fitallinit <- FitInlaAll(form,datshrinkj,famsj, logdisp=logdisp, logitp0=logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),curvedispfun=NULL,...)
+    fitallinit <- FitInlaAll(form,datshrinkj,famsj, logdisp=logdisp, logitp0=logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F),curvedispfun=NULL, designlist=designlistj,...)
     logsums <- log(apply(datshrinkj,1,sum))
     logdisps <- unlist(lapply(fitallinit,function(ex) {
     #ex <- fitallinit[[1]]
@@ -272,7 +274,8 @@ for(j in 1:lngene){
             sel <- c(sel,sample(wh,nsample))
             }
         }
-    datshrinkj <- dat[sel,]  
+    if(class(dat)[1] =="list") datshrinkj <- dat[sel] else datshrinkj <- dat[sel,]   #NEW
+    designlistj <- designlist[sel] #NEW
     famsj <- fams[sel]
         
     famsjdisp0 <- sapply(famsj,function(fam) if(fam=="zinb" | fam=="zip") "zip" else "poisson") #families when disp pm set to 0
@@ -348,11 +351,11 @@ for(j in 1:lngene){
             
 
             
-           fitall <- FitInlaAll(form,datshrinkj,famsj, logdisp=logdisp, curvedispfun=curvedispfun, logitp0=logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F), ndigits=5,...)
+           fitall <- FitInlaAll(form,datshrinkj,famsj, logdisp=logdisp, curvedispfun=curvedispfun, logitp0=logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F), ndigits=5, designlist=designlistj, ...)
            #fitall <- FitInlaAll(form,datshrinkj,famsj, logdisp=logdisp, curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf, ncpus=ncpus2use, ndigits=5)
            mliksall <- mliks(fitall)
             if(mixtdisp) {
-                fitalldisp0 <- FitInlaAll(form,datshrinkj,famsjdisp0, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,ndigits=5, ...)         
+                fitalldisp0 <- FitInlaAll(form,datshrinkj,famsjdisp0, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,ndigits=5, designlist=designlistj,...)         
                 #fitalldisp0 <- FitInlaAll(form,datshrinkj,famsjdisp0, logdisp, curvedispfun=curvedispfun, logitp0, cf=cf, control.compute=list(dic=F, mlik=T, cpo=F), ndigits=5, ncpus=ncpus2use)
                 mliksall0 <- mliks(fitalldisp0)       
                 if(!is.null(shrinkfixed)) postfixed <- fitinlacombine(list(fitalldisp0,fitall),probs=diracprob, modus="fixed",para=shrinkfixed,nsam=nsamtagfixed,safemode=safemode)
@@ -379,10 +382,10 @@ for(j in 1:lngene){
                 
                 if(shrinkp0) postp0 <- fitinlacombine(list(fitalldisp0,fitall),probs=diracprob, modus="p0",nsam=nsamtag,safemode=safemode) #PROBS IS NOT RELEVANT IN THIS CASE
                 if(shrinkdisp) postdisp <- fitinlacombine(list(fitalldisp0,fitall),probs=diracprob, modus="disp",nsam=nsamtag,safemode=safemode)
-            }
+            } #END mixtdisp
             
             if(mixtrand) {
-                fitallrand0 <- FitInlaAll(formrand0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf, ndigits=5, ...)      
+                fitallrand0 <- FitInlaAll(formrand0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf, ndigits=5,designlist=designlistj, ...)      
                 mliksall0 <- mliks(fitallrand0) 
                 #fitallrand0 <- FitInlaAll(formrand0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf, ndigits=5)  
                 if(!is.null(shrinkfixed)) postfixed <- fitinlacombine(list(fitallrand0,fitall),probs=diracprob, modus="fixed",para=shrinkfixed,nsam=nsamtagfixed,safemode=safemode)
@@ -416,7 +419,7 @@ for(j in 1:lngene){
             }
             
             if(!is.null(excludefornull)) {
-                fitall0 <- FitInlaAll(form0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,ndigits=5,...)      
+                fitall0 <- FitInlaAll(form0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,ndigits=5,designlist=designlistj,...)      
                 #fitall0 <- FitInlaAll(form0,datshrinkj, logdisp=logdisp,curvedispfun=curvedispfun, logitp0=logitp0, control.compute=list(dic=F, mlik=T, cpo=F),cf=cf,ndigits=5)  
                 mliksall0 <- mliks(fitall0)
                 if(!is.null(shrinkfixed)) postfixed <- fitinlacombine(list(fitall0,fitall),probs=diracprob, modus="fixed",para=shrinkfixed,nsam=nsamtagfixed,safemode=safemode)
