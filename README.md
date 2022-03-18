@@ -38,7 +38,7 @@ Unix/Linux: if you can't install "XML", "rgl", try
 sudo apt-get build-dep r-cran-xml
 sudo apt-get build-dep r-cran-rgl
 
-2.source("http://www.math.ntnu.no/inla/givemeINLA.R") 
+2.install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE)
  [or if you installed INLA before 01/10/2012 you should upgrade by using inla.upgrade() ]
 
 Then, install ShrinkBayes:
